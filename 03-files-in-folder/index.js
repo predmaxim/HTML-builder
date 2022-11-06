@@ -3,11 +3,10 @@ const fs = require('fs/promises');
 
 const secretDir = path.join(__dirname, 'secret-folder');
 
-const getFiles = (dirPath) => fs.readdir(dirPath, { withFileTypes: true });
+const getFilesStats = (dirPath) => fs.readdir(dirPath, { withFileTypes: true });
 const getFileSize = (filePath) => fs.stat(filePath, (err, file) => file);
 
-getFiles(secretDir).then(filesStats =>
-
+getFilesStats(secretDir).then(filesStats =>
   filesStats.map(el => {
 
     const fileName = el.name.slice(0, el.name.lastIndexOf('.') === -1
