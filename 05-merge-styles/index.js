@@ -6,45 +6,31 @@ const stylesDir = path.join(__dirname, 'styles');
 const projectDir = path.join(__dirname, 'project-dist');
 const bundleCss = path.join(projectDir, 'bundle.css');
 
-// Чтение содержимого папки styles
-const getFilesInDir = (dirToView) => {
-  return readdir(dirToView, { withFileTypes: true });
-};
-
-
-// Проверка является ли объект файлом и имеет ли файл нужное расширение
 const getFilesWithExt = (dirToCheck, fileExtToCheck) => {
 
-  const res = [];
+  return dirToCheck.filter(el => {
+    return el.isFile() && path.extname(el.name).slice(1) === fileExtToCheck;
+  });
 
-  for (const el of dirToCheck) {
-    if (el.isFile() && path.extname(el.name).slice(1) === fileExtToCheck) {
-      res.push(el);
-    }
-  }
-
-  return res;
 };
 
+const createBundle = async (dir, fileForWritePath) => {
 
-const setBundle = async (dir, filePathForWrite) => {
-
-  const allFiles = await getFilesInDir(dir);
+  const allFiles = await readdir(dir, { withFileTypes: true });
   const filesWithExt = getFilesWithExt(allFiles, 'css');
 
   filesWithExt.forEach((file) => {
 
-    const filePathForRead = path.join(stylesDir, file.name);
+    const fileForReadPath = path.join(stylesDir, file.name);
 
-    rm(filePathForWrite, () => {
-      readFile(filePathForRead, (err, filePathForReadContent) => {
+    rm(fileForWritePath, () => {
+      readFile(fileForReadPath, (err, content) => {
         if (err) throw err;
-        appendFile(filePathForWrite, filePathForReadContent, () => { });
+        appendFile(fileForWritePath, content, () => { });
       });
     });
 
   });
 };
 
-
-setBundle(stylesDir, bundleCss);
+createBundle(stylesDir, bundleCss);
