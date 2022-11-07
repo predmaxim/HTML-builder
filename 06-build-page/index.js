@@ -1,4 +1,4 @@
-const { stat, mkdir, readFile, readdir, appendFile, copyFile, rm } = require('fs/promises');
+const { mkdir, readFile, readdir, appendFile, copyFile, rm } = require('fs/promises');
 const path = require('path');
 
 
@@ -20,26 +20,23 @@ const getFilesWithExt = (dirToCheck, fileExtToCheck) => {
 const createHTML = async () => {
 
   const templatePath = path.join(__dirname, 'template.html');
-  
-  let template = await readFile(templatePath, 'binary');
-
+  const htmlPath = path.join(__dirname, 'project-dist', 'index.html');
   const componentsPath = path.join(__dirname, 'components');
 
+  let template = await readFile(templatePath, 'binary');
   const componentsPathDir = await readdir(componentsPath, { withFileTypes: true });
-
   const components = await getFilesWithExt(componentsPathDir, 'html');
 
   for (let component of components) {
 
-    if (template.replace(/\s/g, '').includes(`{{${component}}}`)) {
-      const componentPath = path.join(componentsPath, `${component}.html`);
+    const componentName = (component.name).split('.')[0];
+    if (template.replace(/\s/g, '').includes(`{{${componentName}}}`)) {
+      const componentPath = path.join(componentsPath, `${componentName}.html`);
       const componentContent = await readFile(componentPath);
-      template = template.replace(`{{${component}}}`, componentContent);
+      template = template.replace(`{{${componentName}}}`, componentContent);
     }
-
   }
 
-  const htmlPath = path.join(__dirname, 'project-dist', 'index.html');
   await appendFile(htmlPath, template);
 
 };
