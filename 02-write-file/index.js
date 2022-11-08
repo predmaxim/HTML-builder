@@ -15,4 +15,7 @@ const goodbye = () => {
 process.stdin.write('', hello);
 process.on('SIGINT', goodbye);
 
-process.stdin.on('data', (data) => data.toString().match(/exit(\s)*\n/g) ? goodbye() : writeStream.write(data));
+process.stdin.on('data', (data) =>
+  data.toString().match(/exit(\s)*\n/)
+    ? goodbye()
+    : writeStream.write(data));
