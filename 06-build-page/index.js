@@ -50,30 +50,26 @@ const createCSS = async () => {
   }
 };
 
-const createAssets = async () => {
-  const assetsSource = path.join(__dirname, 'assets');
-  const assetsTarget = path.join(__dirname, 'project-dist', 'assets');
+const copyAssets = async function (from, to) {
+  try {
 
-  const filesData = await readdir(assetsSource, { withFileTypes: true });
+    await mkdir(to, { recursive: true });
 
-  for (const fileData of filesData) {
-    if (fileData.isDirectory()) {
-
-      const source = path.join(assetsSource, fileData.name);
-      const target = path.join(assetsTarget, fileData.name);
-
-      const newFilesData = await readdir(source, { withFileTypes: true });
-
-      for (const newFileData of newFilesData) {
-        await mkdir(target, { recursive: true });
+    const files = await readdir(from, { withFileTypes: true });
+    for (let file of files) {
+      if (file.isDirectory()) {
+        copyAssets(
+          path.join(from, file.name),
+          path.join(to, file.name)
+        );
+      } else {
         await copyFile(
-          `${source}/${newFileData.name}`,
-          `${target}/${newFileData.name}`
+          path.join(from, file.name),
+          path.join(to, file.name)
         );
       }
-
     }
-  }
+  } catch (err) { console.log(err); }
 };
 
 const createProject = async () => {
@@ -81,7 +77,10 @@ const createProject = async () => {
   await createProjectDir('project-dist');
   await createHTML();
   await createCSS();
-  await createAssets();
+  await copyAssets(
+    path.join(__dirname, 'assets'),
+    path.join(__dirname, 'project-dist', 'assets')
+  );
 
 };
 
