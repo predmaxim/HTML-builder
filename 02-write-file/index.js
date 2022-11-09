@@ -12,7 +12,7 @@ const goodbye = () => {
   process.exit();
 };
 
-process.stdin.write('', hello);
+process.stdout.write('', hello);
 process.on('SIGINT', goodbye);
 
 process.stdin.on('data', (data) =>
